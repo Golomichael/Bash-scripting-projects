@@ -1,0 +1,41 @@
+linux: RHEL8 AWS
+Apache: Apache 2
+Mysql: Maria DB
+PHP
+ Bash shell scripting to install and configure a LAMP Server in RHEL8
+
+echo "Installing and configuring LAMP Server...."
+sleep 5
+
+#Install apache
+echo "Installing Apache ...."
+sleep 5
+yum install httpd -y
+systemctl enable --now httpd
+echo "Apache web server Installed successfully...."
+sleep 5
+
+#Install Mysql (MariaDB)
+echo "Installing Mysql, MariaDB"
+sleep 5
+yum install mariadb-server mariadb -y
+
+sytemctl enable --now mariadb
+
+
+#PHP Installation
+echo "Installing PHP ...."
+sleep 5
+yum install php* -y
+echo "PHP successfully installed ...."
+sleep 5
+
+echo "Restarting the LAMP server ...."
+sleep 5
+systemctl restart httpd
+echo "LAMP Stack or sever Installation completed"
+
+echo "Openning up port 80 on the firewall ..."
+sleep 5
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
