@@ -1,0 +1,30 @@
+Write a bash shell script to:
+
+ Prevent multiple login sessions to the server
+
+If multiple sessions are detected, then the script should warn the User and then end the second session. "Multiple sessions detected for user <login>. Your session will be ended
+
+Note: Root should be exempted
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+y=$(who | awk '{print $1}' | grep -v root | grep `logname` | wc -l)
+
+if
+
+ [ "$y" -gt "1" ]
+
+then
+
+echo "Multiple Sessions Detected for User " `logname`
+
+sleep 5
+
+echo "Your Session will be terminated..." 
+
+sleep 5
+
+exit 
+
+fi
