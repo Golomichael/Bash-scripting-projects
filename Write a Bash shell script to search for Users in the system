@@ -1,0 +1,8 @@
+read -p "Enter User's login name:'login
+if
+test | grep $login /etc/passwd > /dev/null
+then
+echo $login "Has a User Account in this Server
+else
+echo $login " Has no Account in this server"
+fi 
