@@ -1,0 +1,27 @@
+---
+
+- name: dir
+
+  hosts: aws-rhel8
+
+  become: yes
+
+  tasks:
+
+    - name: Directories Files Copy
+
+      file: path=/home/ansible/yumi1 state=touch owner=ansible group=ansible
+
+    - name: Create File
+
+      file: path=/home/ansible/test60 state=directory owner=ansible group=ansible
+
+    - name: example copying file with owner and permissions
+
+      copy:
+
+        src: /home/ansible/yumi1
+
+        dest: /home/ansible/test60
+
+        remote_src: yes
