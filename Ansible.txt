@@ -1,0 +1,356 @@
+DevOps is a group of systems or applications that seek to unit, facilitate and automate developement and operation tasks. 
+
+Ansible (Configuration Management tool)
+Released in 2012 by Michael Dettaan.
+
+YAML (Yet Another Markup Language
+YAML Ain't Markup Language
+
+YAML is a date serilisation designed to be directly writable and readable by humans.
+
+            In case you have to enable epel on centos 7
+
+
+1. Create a new file called 'ansible.repo' in /etc/yum.repos.d
+2. Copy the following content into it:
+
+[Ansible]
+name = ansible
+baseurl = https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/
+enabled = 1
+gpgcheck = 0
+
+3. Run 'yum update'
+4. Install ansible (sudo yum install ansible)
+
+           On aws rhel8
+1.  install python
+#yum install python2 -y
+
+2.Next, we should setup alternatives for our Python2 commands to run using Python. Use the command below for both instances:
+
+#alternatives --set python /usr/bin/python2
+
+3.Now, you must install Python3-pip on the instance. Pip is a package manager for Python that allows you to install and manage additional Python packages which are not part of the standard python library.
+
+#yum -y install python2-pip
+
+4.We wouldn’t be able to install Ansible as a root user here, because in RHEL 8, this operation is not allowed. So, we are going to create a new user and setup a password for it.
+
+#useradd ansiblecontrol
+
+#passwd ansiblecontrol
+For the second instance, create a user named, “managedhost” and setup a password for it as well.
+
+Once completed, we should add the user ‘ansiblecontrol’ to sudoers file for sudo access. Use the command below to do that.
+
+#echo “ansiblecontrol ALL=(ALL) NOPASSWD: ALL” >> /etc/sudoers
+
+Similarly, repeat the above with the user “managedhost” in the second instance.
+
+5.The control node, also referred to as Ansible Master, connects to the managed host using SSH. Though using key-based authentication is recommended, when you are at a learning stage, use password-based authentication.
+
+Edit the sshd_config file in /etc/ssh directory using vi.
+
+#vi /etc/ssh/sshd_config
+
+Find the PasswordAuthentication string in that file and change the value against it to ‘yes’. Save and quit the file.
+
+Reload sshd service using the command below:
+
+#service sshd reload
+
+Step 6:
+
+In RHEL 8, Ansible cannot be installed as a root user. So, we are going to install Ansible after switching user to the one which we created earlier in Step 4. Use the commands provided below for the same.
+
+#su ansiblecontrol
+
+$pip3 install ansible — user
+
+
+
+(le shell module applique aussi les simples command du bash et chaque module est en fonctiondes taches que nous voulons accomplir) 
+
+          Execute Standard shell commands or AD-HOC commands in ansible
+1. The ansible command modules (A module is a set of commands that can be pushed out to ansible clients by the ansible server)
+The command module is used to execute regular shell commands by ansible.
+Display the pwd of the ansible user in the AWS RHEL8 ansible client
+
+$ansible aws -m command -a 'pwd'
+-m = specify module
+-a = add command
+
+2. Have ansible display the content of /etc/hosts and the pwd of the ansible user of the aws server all at once
+
+$ansible aws -m command -a 'cat /etc/hosts && pwd' (will fail because th command module is limited and will not execute option like thsis) 
+The shell module will execute bashell commands without limitation
+
+3. The ansible shell module (used to execute shell commands in ansible)
+
+$ansible aws -m shell -a 'cat /etc/hosts && pwd'
+
+4. Have ansible create a User account using the shell module in the aws client
+
+$ansible aws -m shell  -a 'useradd -c "devops26" -m devops26'
+(will fail because the ansible account does not have sudo rights to create the account)
+
+$ansible aws -m shell  -a 'useradd -c "devops26" -m devops26' --become
+--become (will grant sudo rights to the ansible command)
+verify in the aws client
+$cat /etc/passwd
+
+
+5. The file module (used to create files and diectories)
+Create file called file26 in the home of the aws ansible client server
+$ansible aws -m file -a 'path=/home/ansible/file state=touch'
+(state=touch means we are creating a file)
+verify on aws client (always make sure we are logged to ansible account on the aws client)
+$ls
+
+Have ansible create a directory called dir26 in the ansible user home of the aws client
+$ansible aws -m file -a 'path=/home/ansible/dir26 state=directory'
+$ls -l (to verify in aws)
+OR
+$ansible aws -m shell -a 'mkdir dir26'
+
+Have ansible create a directory calle class26aws in the aws client using the file module, with permission 777, owner = root of the group root
+
+$ansible aws -m file -a 'path=/home/ansible/class26aws state=directory mode=777 owner=root group=root' --become
+verify in aws
+$ls
+$ls -ld class26aws
+
+Have ansible change the permission attribute of the file file26 in aws as follows; Mode=760, Owner=root, Group=root
+
+
+$ansible aws -m file -a 'path=/home/ansible/file26 mode=file mode=760 owner=root group=root' --become
+$ls -l file26 (to verify in aws)
+
+Have ansible delete the file file26 from the ansible user home of the aws server
+$ansible aws -m file -a 'path=/home/ansible/file26 state=absent'
+(state=absent will delete a file or directory)
+$ls to verify in aws
+
+The copy module
+1. Use the shell module to copy the /etc/passwd file to the home of the ansible user in aws
+$ansible aws -m shell -a 'cp /etc/passwd .' (The shell command can be used for simple command)
+$ls to verify in AWS)
+
+2.Use the copy module to copy /etc/hosts to the home of ansible user in aws.
+
+$ansible aws -m copy -a 'src=/etc/hosts dest=/home/ansible remote_src=yes'
+
+(remote_src=yes copy operation should be performed entirely in remote client) this means /etc/hosts still on the remote aws and has to be coppied on the same aws server. (but $ansible aws -m copy -a 'src=/etc/hosts dest=/home/ansible' will make ansible server think that the operation is performed from ansible server to aws server)
+
+3.Create a directory called diraws1 in the pwd of your ansible user in the ansible server.Have ansible transfer or copy the file to th ansible user's home in aws
+$mkdir diraws1 (in ansible)
+
+$ansible aws -m copy -a 'src=/home/ansible/diraws1 dest=/home/ansible'
+
+$ansible aws -m copy -a 'src=/home/ansible/f26 dest=/home/ansible'
+OR
+$ansible aws -m copy -a 'src=f26 dest=/home/ansible'
+$ls (to verify in aws)
+
+4.Creating an account in the remote ansible client
+create an account for Peter Tosh using standard using standars specs
+
+$ansible aws -m shell -a 'useradd -c "Peter Tosh" -m ptosh' --become
+
+5.Create a user account for Bob Marley using the user module
+$ansible aws -m user -a 'name=bmarley comment="Bob Marley" home=/home/ansible25c group=ansible' --become
+
+6.Create an account for Kevin Hart with standard specs and assign him the password:School1@12 using the ansible user module
+
+A.Create the password hash or ecryption
+$openssl passwd -crypt (and enter you desired password)
+
+B.Create the account
+$ansible aws -m user -a 'name=khart comment="Kevin Hart" password=mbDnBEZ0jkt76' --become 
+
+Verify in client system
+$cat /etc/passwd
+$cat /etc/shadow (to verify hash)
+Login as khart from putty and use the password
+
+7.Install a package using ansible.
+Use the yum module to install apache in the ansible client
+$ansible aws -m yum -a 'name=httpd state=present' --become 
+$yum list installed httpd (to verify on the client system)
+
+B.Start the appache daemon
+$ansible aws -m service -a 'name=httpd state=started' --become
+$service httpd status (on client to verify)
+$ansible aws -m shell -a 'chkconfig httpd on' --become (to make it permanent)
+
+Install the firewalld package
+$ansible aws -m ym -a /name=firewalld state=present' --become
+$ansible aws -m shell -a 'chkconfig firewalld on' --become (to make it permanently enable the daemon)
+
+D.Open up port 80 the firewall
+$ansible aws -m shell -a 'firewall-cmd --permanent --add-service=http && firewall-cmd --reload' --become
+
+E.Verify your apache server from a browser
+http://<public ip of your RHEL8 Instance or apache sewrver>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CENTOS 7/ REDHAT 7
+
+EPEL (Extra Packages for Entreprise Linux)
+#yum install epel-release.
+
+CENTOS 6/ REHAT 6
+#rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+
+Ansible is used for network automation
+automate configuration application deployment
+patching
+
+
+1.On the ansible server we should create user account  (on the centos 7 server)
+useradd -m ansible
+password=Emeraude2289/
+
+2.same thing for the AWS client server (create an ansible account)
+
+
+3.login on ansible Server and generate public key (RSA KEY)
+$su - ansible (to login into the ansible account!!!)
+$ssh-keygen -t rsa   RSA ==>>Remote Security Authorization
+create RSA KEY ==>> press enter 3 times
+
+4.Transfert ssh key from ansible server to the ansible account in the aws server
+
+$ssh-copy-id ansible@3.88.169.156
+
+a.Check if we have passwordless access to the aws client
+$ssh ansible@18.233.5.93
+#vi /etc/sudoers and add the following line
+ansible ALL=(ALL) NOPASSWD ALL
+5.Add our cloud aws to the inventory list (must go on the ansible server)
+
+to check if we have ansible onthe system
+$ansible --version
+#su - ansible to login to the ansible account
+$vi /etc/ansible/hosts
+add the following lines:
+[aws]
+18.233.5.93 (ip adress of the aws server)
+
+$ansible aws -m ping (verify telling ansible to bping server in this group or cloud)
+
+
+
+
+      What is the netstat used for?
+It is used to display incoming and outgoing TCP and UDP network connections,routingtable,NIC,and network statistics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
