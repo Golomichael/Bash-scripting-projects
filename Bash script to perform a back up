@@ -1,0 +1,14 @@
+#!/bin/bash
+#Perform a full backup
+#Perform a backup of "all files in mluther's home dirtectory"
+echo "Creating a directory for backup files"
+sleep 2
+mkdir /home/backup
+chmod 777 /home/backup
+echo "directoy created and permission set up. Now let's move into the backup directory and perform the backup"
+sleep 2
+cd /home/backup
+tar -cvf mluther.tar /home/mluther/*
+ls /export/home/backup
+echo " Backup succesfully created "
+
