@@ -1,0 +1,21 @@
+#Create a centos vm container on with Docker
+
+read -p "Enter Container Name: " cname
+
+read -p "Enter Container Port: " pname
+
+read -p "Enter Mapping Path: " mpath
+
+
+sleep 3
+
+echo "Configuring Docker Container......"
+
+sleep 3
+
+docker run --name $cname -it --restart unless-stopped --privileged -p $pname -v $mpath -d centos /usr/sbin/init
+
+sleep 3
+
+echo "Docker Container successfully Created"
+
