@@ -1,0 +1,16 @@
+#!/bin/bash
+#Installing httpd server
+user_id=`id -u` &&  1>/dev/null
+echo "Checking if you are allowed to install an app on this server?"
+sleep 3
+if
+[[ $user_id -ne 0 ]]
+        then
+        echo "you are not allowed to perform this action on this server, you need root or sudo priviledge"
+        exit 1
+        else
+        yum install -y httpd
+        systemctl enable httpd
+        systemctl start httpd
+fi
+
