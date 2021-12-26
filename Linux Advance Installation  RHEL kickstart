@@ -1,0 +1,61 @@
+           Linux Advance Installation
+
+
+RHEL kickstart
+It is an automated unattended installation method. It is used to install several UNITS at a time.
+
+The Kickstart Concept
+
+1. Create the kickstart configuration file. (ks.cfg)
+
+2. Make the file available on the network. Share the file on the network. It can be placed on an ftp, http (Apache), nfs share and an installation media.
+
+3. Boot up the client and modify the kernel line to point to the ks.cfg file
+
+A. Create the ks.cfg file from a linux platform
+i. Modify theroot/anaconda-ks.cfg file to create the ks.cfg.
+#cd /root
+#cp anaconda-ks.cfg
+
+OR
+
+ii. Use the system-config-kickstart tool
+-Install the tool
+#yum install system-config-kickstart
+
+-Run the tool and create the ks.cfg file
+#system-config-kickstart (It must be executed fom the console of the server)
+
+-Partition 
+add disk slicing from
+root (/ )
+/boot around 500MB
+SWAP around 3GB
+/home (around 8GB)
+
+-Network configuration
+DHCP,DNS IP ADDRESS
+
+-Authentication
+-Firewall Configuration
+
+B. Move the file to an NFS server in order to share it on the network
+
+#scp ks.cfg student@192.168.1.206:/export 
+(If permission denied just chown username <directory destination>
+
+C. Setup RHEL Linux client and modify the kernel line to point to the ks.cfg file
+
+After interrupting client bootup and mounting the iso image ,press tab at 
+go at the bottom and add following
+(vm....."space ks=nfs:192.168.1.206:/export/ks.cfg ksdevice=eth0
+ks=nfs:192.168.1.206:/export/ks.cfg ksdevice=eth0 and hit Enter to start the automated installation
+
+
+If Apache server
+ks=http://server/path
+e.g
+ks=http://192.168.1.206/kickstart/ks.cfg ksdevice=eth0
+
+ks=file:/kickstart/ks.cfg
+
