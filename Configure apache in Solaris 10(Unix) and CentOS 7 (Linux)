@@ -1,0 +1,88 @@
+Apache is an open source freeware webserver it is the most popular webserver. It is the most popular webserver ever built.
+types of apache webservers
+
+A)Apache http (used to host static websites and application ==>informational website) and dynamic website which contain multi media= Lamp server wordpress.
+
+B)Apache tomcat (used to host java based websites and application)
+
+
+1.Apache http (used to host static websites and application)
+
+2.Apache tomcat (used to host java based websites and application)
+
+
+                   Configure apache http in Solaris
+
+version= version 2
+Apache come installed but not configured
+default daemon : http or apache2
+default config file : httpd.conf (/etc/apache2/httpd.conf)
+
+Document Root: /var/apache2/htdocs
+
+1.create the file http.conf
+
+#cp httpd.conf-example httpd.conf
+
+2.enable apache daemon
+#svcs http (to check status)
+#svcadm enable http
+
+3. Check and verify
+open a browser and put the ip adress
+
+
+
+                          Configure apache in Linux
+Apache does not come installed in Linux.It must be installed and configured
+
+Daemon : httpd
+config file: httpd.conf (/etc/httpd/conf/httpd.conf)
+Document root : /var/www/html
+
+1. Install apache
+#yum install httpd -y
+
+2. Open up port
+#system-config-firewall
+#service iptables restart (to enforce)
+#service httpd status
+#service httpd status (to check)
+#service httpd start
+#chkconfig httpd --level 35 on
+
+
+                        Build and host a website with apache
+
+#cd /var/apache2/htdocs
+#mkdir class13
+#chmod 777 class13
+
+Open up some ports (89)
+#vi /etc/apache2/httpd.conf
+"/Listen" to go to this line and add the this line: Listen 192.168.1.206:87 
+#svcs http (to verify)
+
+#cat /var/svc/log/network-http\:apache2.log  (to verify what is wrong with the file and correct it)
+to test in the browseryou type 192.168.1.206:89
+89= port opened
+
+Use a pagemaker website
+
+
+Open the website to the public
+
+to list the port and specify 
+#grep Listen /etc/apache2/httpd.conf
+
+
+
+
+EDIT THE DEFAULT PAGE !!!!!!!!!
+
+
+Go in /etc/httpd/conf.d/welcome.conf
+comment the line Index or change the "-" in to "+"
+then 
+#systemctl restart httpd
+echo "the data you want" > /var/www/html/index.html
