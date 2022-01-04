@@ -1,0 +1,19 @@
+#!/bin/bash
+#Configure firewall on RHEL 8  and add service
+echo " Firewall configuration............................."
+sleep 3
+echo "I am verifying if you are allowed to perform this action on this server?"
+permission=`id -u`
+
+if [[ $permission -ne 0 ]];
+then
+        echo " You are not allowed to perform this action on this server you need root or sudo priviledge "
+        exit 1
+else
+        echo " You are configuring the firewall on this server "
+        sleep 2
+        firewall-cmd --add-port=80/tcp --zone=public --permanent
+        firewall-cmd --add-port=8080/tcp --zone=public --permanent
+       firewall-cmd --permanent --new-service=myservice
+fi
+
